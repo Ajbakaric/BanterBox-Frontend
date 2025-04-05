@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';  // Use default axios directly
- // adjust path if needed
-
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+const API = import.meta.env.VITE_API_URL;
 
 const Signup = ({ setUser }) => {
   const [email, setEmail] = useState('');
@@ -13,27 +13,27 @@ const Signup = ({ setUser }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
     formData.append('user[email]', email);
     formData.append('user[password]', password);
     formData.append('user[username]', username);
     if (avatar) formData.append('user[avatar]', avatar);
-  
+
     try {
-      const res = await axios.post('http://localhost:3000/signup', formData, {
+      const res = await axios.post(`${API}/signup`, formData, {
         headers: {
           'Accept': 'application/json'
         }
       });
-  
+
       localStorage.setItem('token', res.data.token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
       setUser(res.data.user);
       navigate('/chatrooms');
     } catch (err) {
-      console.error('Signup failed', err);
-      alert('Signup failed.');
+      console.error('Signup failed', err.response?.data || err);
+      alert(`Signup failed: ${err.response?.data?.errors?.join(', ') || 'Unknown error'}`);
     }
   };
 
