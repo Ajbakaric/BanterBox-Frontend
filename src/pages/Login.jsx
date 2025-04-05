@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';  // Use the default axios import
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+const API = import.meta.env.VITE_API_URL;
 
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
@@ -10,19 +12,18 @@ const Login = ({ setUser }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:3000/login', {
+      const res = await axios.post(`${API.replace('/api/v1', '')}/login`, {
         user: { email, password },
       }, {
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json' // 🪲 This tells Rails: “This is JSON, not HTML!”
+          'Accept': 'application/json',
         }
       });
-      
-      
+
       const token = res.data.token;
       localStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;  // Set token in default axios
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   
       setUser(res.data.user);
       navigate('/chatrooms');
@@ -31,7 +32,6 @@ const Login = ({ setUser }) => {
       alert('Invalid credentials');
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#eafce3] to-[#74e291]">

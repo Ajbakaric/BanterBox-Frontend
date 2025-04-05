@@ -3,7 +3,10 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { createConsumer } from '@rails/actioncable';
 
-const consumer = createConsumer('ws://localhost:3000/cable');
+const API = import.meta.env.VITE_API_URL;
+const CABLE_URL = import.meta.env.VITE_CABLE_URL;
+
+const consumer = createConsumer(CABLE_URL);
 
 const ChatRoom = ({ user }) => {
   const { id } = useParams();
@@ -16,7 +19,7 @@ const ChatRoom = ({ user }) => {
 
   const fetchMessages = async () => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/v1/chat_rooms/${id}/messages`, {
+      const res = await axios.get(`${API}/chat_rooms/${id}/messages`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -62,7 +65,7 @@ const ChatRoom = ({ user }) => {
 
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/chat_rooms/${id}/messages`,
+        `${API}/chat_rooms/${id}/messages`,
         formData,
         {
           headers: {
@@ -97,7 +100,7 @@ const ChatRoom = ({ user }) => {
   const handleEdit = async (messageId) => {
     try {
       const res = await axios.patch(
-        `http://localhost:3000/api/v1/chat_rooms/${id}/messages/${messageId}`,
+        `${API}/chat_rooms/${id}/messages/${messageId}`,
         { message: { content: editingContent } },
         {
           headers: {
@@ -106,7 +109,6 @@ const ChatRoom = ({ user }) => {
         }
       );
 
-      // 🐛 Preserve sender info during update
       setMessages((prev) =>
         prev.map((m) =>
           m.id === messageId ? { ...m, ...res.data } : m
@@ -123,7 +125,7 @@ const ChatRoom = ({ user }) => {
   const deleteMessage = async (messageId) => {
     try {
       await axios.delete(
-        `http://localhost:3000/api/v1/chat_rooms/${id}/messages/${messageId}`,
+        `${API}/chat_rooms/${id}/messages/${messageId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,

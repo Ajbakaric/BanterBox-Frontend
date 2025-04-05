@@ -8,6 +8,9 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 
+const API = import.meta.env.VITE_API_URL;
+const ROOT_API = API.replace('/api/v1', '');
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,14 +22,13 @@ function App() {
 
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      window.axios = axios; // ✅ Makes axios available in DevTools
+      window.axios = axios;
 
-      axios.get('http://localhost:3000/profile')
-      .then((res) => {
-        console.log('[🐛DEBUG] Profile response:', res.data);
-        setUser(res.data.user);
-      })
-    
+      axios.get(`${ROOT_API}/profile`)
+        .then((res) => {
+          console.log('[🐛DEBUG] Profile response:', res.data);
+          setUser(res.data.user);
+        })
         .catch(() => {
           console.error('Auth token invalid or expired.');
           localStorage.removeItem('token');

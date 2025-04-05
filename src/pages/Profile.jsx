@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API = import.meta.env.VITE_API_URL;
+const ROOT_API = API.replace('/api/v1', '');
+
 const Profile = ({ user, setUser }) => {
   const [username, setUsername] = useState(user?.username || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -8,7 +11,11 @@ const Profile = ({ user, setUser }) => {
 
   const refreshUser = async () => {
     try {
-      const res = await axios.get('/profile');
+      const res = await axios.get(`${ROOT_API}/profile`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
       setUser(res.data.user);
     } catch (err) {
       console.error('Failed to refresh user:', err);
@@ -18,11 +25,16 @@ const Profile = ({ user, setUser }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.put('http://localhost:3000/profile', {
+      await axios.put(`${ROOT_API}/profile`, {
         user: { username, email },
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
       });
 
-      await refreshUser(); // ✅ get updated avatar_url if changed
+      await refreshUser();
       alert('Profile updated!');
     } catch (err) {
       alert('Update failed.');
@@ -37,13 +49,14 @@ const Profile = ({ user, setUser }) => {
     formData.append('user[avatar]', avatar);
 
     try {
-      const res = await axios.put('http://localhost:3000/profile', formData, {
+      await axios.put(`${ROOT_API}/profile`, formData, {
         headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      await refreshUser(); // ✅ refresh data after avatar update
+      await refreshUser();
       alert('Avatar uploaded!');
     } catch (err) {
       alert('Avatar upload failed.');
