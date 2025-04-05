@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';  // Use default axios directly
-// adjust path if needed
-
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+const API = import.meta.env.VITE_API_URL;
 
 const ChatRooms = ({ user }) => {
   const [chatRooms, setChatRooms] = useState([]);
@@ -11,7 +11,11 @@ const ChatRooms = ({ user }) => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3000/api/v1/chat_rooms')
+      .get(`${API}/api/v1/chat_rooms`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
       .then((res) => setChatRooms(res.data))
       .catch((err) => console.error('Failed to fetch chat rooms:', err));
   }, []);
@@ -21,7 +25,7 @@ const ChatRooms = ({ user }) => {
 
     try {
       const res = await axios.post(
-        'http://localhost:3000/api/v1/chat_rooms',
+        `${API}/api/v1/chat_rooms`,
         { chat_room: { name: roomName } },
         {
           headers: {
@@ -40,7 +44,7 @@ const ChatRooms = ({ user }) => {
     if (!window.confirm('Are you sure you want to delete this room?')) return;
 
     try {
-      await axios.delete(`http://localhost:3000/api/v1/chat_rooms/${id}`, {
+      await axios.delete(`${API}/api/v1/chat_rooms/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
