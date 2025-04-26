@@ -11,7 +11,7 @@ const ChatRooms = ({ user }) => {
 
   useEffect(() => {
     axios
-      .get(`${API}/api/v1/chat_rooms`, {
+      .get(`${API}/chat_rooms`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -25,7 +25,7 @@ const ChatRooms = ({ user }) => {
 
     try {
       const res = await axios.post(
-        `${API}/api/v1/chat_rooms`,
+        `${API}/chat_rooms`,
         { chat_room: { name: roomName } },
         {
           headers: {
@@ -44,7 +44,7 @@ const ChatRooms = ({ user }) => {
     if (!window.confirm('Are you sure you want to delete this room?')) return;
 
     try {
-      await axios.delete(`${API}/api/v1/chat_rooms/${id}`, {
+      await axios.delete(`${API}/chat_rooms/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
